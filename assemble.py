@@ -5,6 +5,9 @@ def dot(A,B,axis=2):
 	'''
 	dot product of each slice of 3d matrices
 	shapes: (A1,A2,A3) & (B1,B2,B3)
+	the function also accepts:
+		(A1,A2) & (B1,B2,B3)
+		and (A1,A2,A3) & (B1,B2)
 	A2 = B1
 	A3 = B3
 	'''
@@ -12,15 +15,15 @@ def dot(A,B,axis=2):
 		n1 = A.shape[0]
 		n2 = B.shape[1]
 		n3 = B.shape[2]
-		if (A.shape[1]!=B.shape[0]) or \
-			(A.shape[2]!=B.shape[2]):
-			if A.shape[2]!=1 and B.shape[2]!=1:
-				raise ValueError('shapes not aligned')
+		if (A.shape[1]!=B.shape[0]):
+			if len(A.shape)!=2 and len(B.shape)!=2:
+				if A.shape[2]!=B.shape[2]:
+					raise ValueError('shapes not aligned')
 		product = np.empty([n1,n2,n3])
-		if A.shape[2] == 1:
+		if len(A.shape)==2:
 			for i in xrange(B.shape[2]):	
 				product[:,:,i] = np.dot(A,B[:,:,i])
-		elif B.shape[2] == 1:
+		elif len(B.shape)==2:
 			for i in xrange(A.shape[2]):	
 				product[:,:,i] = np.dot(A[:,:,i],B)
 		else:
@@ -86,11 +89,13 @@ def assemble(x,y,conn,
 		detady = J11/abs(detJ)
 		# diffirential operator
 		divphi = div(dxi,deta,dxidx,dxidy,detadx,detady)
+		# print dot(stiffnessTensor,divphi)[:,:,0]/1*(1-0.25)
 		EDphi = dot(stiffnessTensor,divphi)
 		# EDphiDphi
-		print divphi.shape
-		# integrand = dot(np.transpose(divphi, (1, 0, 2)),divphi)
-		# integrand = integrand*weight*detJ*stiffnessTensor
-		# print integrand
+		integrand = dot(np.transpose(EDphi, (1, 0, 2)),divphi)
+		print integrand[:,:,0]/1*(1-0.25)
+		integrand = integrand*weight*detJ
+		ke = np.sum(integrand,2)
+		# print ke
 
 

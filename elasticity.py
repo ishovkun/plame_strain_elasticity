@@ -36,3 +36,4 @@ assemble(nodex,nodey,connectivityArray,
 # f = np.array([3,2])
 # B = A*f
 # print B[0,0,:]
+print [1+(1-nu/2), nu+(1-nu)/2,-1,-(1-nu)/2]
